@@ -46,6 +46,7 @@ where
 fn get_solver(day: Day) -> Option<Solver> {
     match day.0 {
         1 => box_solver(days::day01::solve),
+        2 => box_solver(days::day02::solve),
         _ => None,
     }
 }
