@@ -49,6 +49,7 @@ fn get_solver(day: Day) -> Option<Solver> {
         2 => box_solver(days::day02::solve),
         3 => box_solver(days::day03::solve),
         4 => box_solver(days::day04::solve),
+        5 => box_solver(days::day05::solve),
         _ => None,
     }
 }
