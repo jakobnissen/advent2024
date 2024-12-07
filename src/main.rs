@@ -21,6 +21,7 @@ fn exit_with(s: &str) -> ! {
 // This struct is used when I've implemented part 1 of a day, but not part 2.
 // I still want to be able to print part 1.
 #[allow(unused)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UnimplementedPartTwo;
 
 impl Display for UnimplementedPartTwo {
@@ -50,6 +51,8 @@ fn get_solver(day: Day) -> Option<Solver> {
         3 => box_solver(days::day03::solve),
         4 => box_solver(days::day04::solve),
         5 => box_solver(days::day05::solve),
+        6 => box_solver(days::day06::solve),
+        7 => box_solver(days::day07::solve),
         _ => None,
     }
 }
@@ -207,14 +210,16 @@ fn download(data_dir: &Path, session_key: &str, days: Option<Vec<Day>>, all: boo
             std::process::exit(0)
         }
     }
+    let mut should_create_dir = false;
     // Create data dir if it does not aleady exists
     if !data_dir.is_dir() {
-        std::fs::create_dir_all(data_dir).unwrap_or_else(|_| {
+        should_create_dir = true;
+        if data_dir.exists() {
             exit_with(&format!(
-                "Could not create data directory, and is not an existing directory: \"{:?}\"",
+                "A file at the given data directory exists, but is a not a directory: \"{:?}\"",
                 data_dir
             ))
-        })
+        }
     }
     // This allows us to lazily construct the client, only if we need it
     let client = OnceCell::new();
@@ -241,6 +246,15 @@ fn download(data_dir: &Path, session_key: &str, days: Option<Vec<Day>>, all: boo
                 },
                 // If downloaded a file, save it
                 Downloaded::Data(s) => {
+                    if should_create_dir {
+                        std::fs::create_dir_all(data_dir).unwrap_or_else(|_| {
+                            exit_with(&format!(
+                                "Could not create data directory, and is not an existing directory: \"{:?}\"",
+                                data_dir
+                            ))
+                        });
+                        should_create_dir = false;
+                    }
                     let mut file = File::create_new(&path).unwrap_or_else(|_| {
                         exit_with(&format!("Could not create new file at path \"{:?}\"", path))
                     });
